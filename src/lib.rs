@@ -313,6 +313,7 @@ pub mod acid_io {
     pub use acid_io::Read;
     pub use acid_io::Result;
     pub use acid_io::Seek;
+    pub use acid_io::SeekFrom;
 }
 
 /// re-export of bitvec

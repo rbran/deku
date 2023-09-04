@@ -136,6 +136,9 @@ struct DekuData {
 
     /// enum only: byte size of the enum `id`
     bytes: Option<Num>,
+
+    /// struct only: seek from current position
+    seek_from_current: Option<Num>,
 }
 
 impl DekuData {
@@ -184,6 +187,7 @@ impl DekuData {
             id_type: receiver.id_type?,
             bits: receiver.bits,
             bytes: receiver.bytes,
+            seek_from_current: receiver.seek_from_current,
         };
 
         DekuData::validate(&data)?;
@@ -434,6 +438,12 @@ struct FieldData {
 
     // assert value of field
     assert_eq: Option<TokenStream>,
+
+    //seek_rewind: Option<Num>,
+    seek_from_current: Option<TokenStream>,
+    //seek_from_end: Option<Num>,
+    //seek_from_start: Option<Num>,
+    //seek_position: Option<Num>,
 }
 
 impl FieldData {
@@ -470,6 +480,11 @@ impl FieldData {
             cond: receiver.cond?,
             assert: receiver.assert?,
             assert_eq: receiver.assert_eq?,
+            //seek_rewind: receiver.seek_rewind?,
+            seek_from_current: receiver.seek_from_current?,
+            //seek_from_end: receiver.seek_from_end?,
+            //seek_from_start: receiver.seek_from_start?,
+            //seek_position: receiver.seek_position?,
         };
 
         FieldData::validate(&data)?;
@@ -649,6 +664,9 @@ struct DekuReceiver {
     /// enum only: byte size of the enum `id`
     #[darling(default)]
     bytes: Option<Num>,
+
+    #[darling(default)]
+    seek_from_current: Option<Num>,
 }
 
 type ReplacementError = TokenStream;
@@ -825,6 +843,10 @@ struct DekuFieldReceiver {
     // assert value of field
     #[darling(default = "default_res_opt", map = "map_litstr_as_tokenstream")]
     assert_eq: Result<Option<TokenStream>, ReplacementError>,
+
+    /// seek from current position
+    #[darling(default = "default_res_opt", map = "map_litstr_as_tokenstream")]
+    seek_from_current: Result<Option<TokenStream>, ReplacementError>,
 }
 
 /// Receiver for the variant-level attributes inside a enum

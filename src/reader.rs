@@ -2,7 +2,7 @@
 
 use core::cmp::Ordering;
 
-use acid_io::{self, Read, Seek};
+use acid_io::{self, Read, Seek, SeekFrom};
 use bitvec::prelude::*;
 
 use crate::{prelude::NeedSize, DekuError};
@@ -30,6 +30,14 @@ pub struct Reader<'a, R: Read + Seek> {
 
 /// Max bits requested from [`Reader::read_bits`] during one call
 pub const MAX_BITS_AMT: usize = 128;
+
+impl<R: Read + Seek> Seek for Reader<'_, R> {
+    fn seek(&mut self, pos: SeekFrom) -> acid_io::Result<u64> {
+        // clear leftover
+        self.leftover = BitVec::new();
+        self.inner.seek(pos)
+    }
+}
 
 impl<'a, R: Read + Seek> Reader<'a, R> {
     /// Create a new `Reader`

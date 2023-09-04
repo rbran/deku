@@ -516,6 +516,17 @@ fn emit_field_read(
         &f.assert_eq,
     ];
 
+    let seek = if let Some(num) = &f.seek_from_current {
+        quote!{
+            use ::#crate_::acid_io::Seek;
+            // TODO: use ?
+            __deku_reader.seek(::#crate_::acid_io::SeekFrom::Current(i64::try_from(#num).unwrap())).unwrap();
+        }
+    } else {
+        quote!{}
+    };
+
+
     let (bit_offset, byte_offset) = emit_bit_byte_offsets(&field_check_vars);
 
     let field_map = f
@@ -710,6 +721,7 @@ fn emit_field_read(
     };
 
     let field_read = quote! {
+        #seek
         #pad_bits_before
 
         #bit_offset
