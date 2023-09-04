@@ -1,4 +1,4 @@
-use acid_io::Read;
+use acid_io::{Read, Seek};
 #[cfg(feature = "alloc")]
 use alloc::format;
 use core::num::*;
@@ -11,7 +11,7 @@ use crate::{DekuError, DekuReader, DekuWrite};
 macro_rules! ImplDekuTraitsCtx {
     ($typ:ty, $readtype:ty, $ctx_arg:tt, $ctx_type:tt) => {
         impl DekuReader<'_, $ctx_type> for $typ {
-            fn from_reader_with_ctx<R: Read>(
+            fn from_reader_with_ctx<R: Read + Seek>(
                 reader: &mut crate::reader::Reader<R>,
                 $ctx_arg: $ctx_type,
             ) -> Result<Self, DekuError> {
@@ -76,9 +76,8 @@ mod tests {
         case(&hex!("00"), NonZeroU8::new(0xFF).unwrap()),
     )]
     fn test_non_zero(input: &[u8], expected: NonZeroU8) {
-        let mut bit_slice = input.view_bits::<Msb0>();
-
-        let mut reader = Reader::new(&mut bit_slice);
+        let mut cursor = acid_io::Cursor::new(input);
+        let mut reader = Reader::new(&mut cursor);
         let res_read = NonZeroU8::from_reader_with_ctx(&mut reader, ()).unwrap();
         assert_eq!(expected, res_read);
 

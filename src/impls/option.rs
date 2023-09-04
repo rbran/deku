@@ -1,10 +1,10 @@
-use acid_io::Read;
+use acid_io::{Read, Seek};
 use bitvec::prelude::*;
 
 use crate::{DekuError, DekuReader, DekuWrite};
 
 impl<'a, T: DekuReader<'a, Ctx>, Ctx: Copy> DekuReader<'a, Ctx> for Option<T> {
-    fn from_reader_with_ctx<R: Read>(
+    fn from_reader_with_ctx<R: Read + Seek>(
         reader: &mut crate::reader::Reader<R>,
         inner_ctx: Ctx,
     ) -> Result<Self, DekuError> {

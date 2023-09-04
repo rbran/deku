@@ -312,6 +312,7 @@ pub mod acid_io {
     pub use acid_io::Cursor;
     pub use acid_io::Read;
     pub use acid_io::Result;
+    pub use acid_io::Seek;
 }
 
 /// re-export of bitvec
@@ -353,12 +354,13 @@ pub trait DekuReader<'a, Ctx = ()> {
     /// let mut reader = Reader::new(&mut file);
     /// let ec = EcHdr::from_reader_with_ctx(&mut reader, Endian::Big).unwrap();
     /// ```
-    fn from_reader_with_ctx<R: acid_io::Read>(
+    fn from_reader_with_ctx<R>(
         reader: &mut crate::reader::Reader<R>,
         ctx: Ctx,
     ) -> Result<Self, DekuError>
     where
-        Self: Sized;
+        Self: Sized,
+        R: acid_io::Read + acid_io::Seek;
 }
 
 /// "Reader" trait: implemented on DekuRead struct and enum containers. A `container` is a type which
@@ -388,9 +390,10 @@ pub trait DekuContainerRead<'a>: DekuReader<'a, ()> {
     /// file.seek(SeekFrom::Start(0)).unwrap();
     /// let ec = EcHdr::from_reader((&mut file, 0)).unwrap();
     /// ```
-    fn from_reader<R: acid_io::Read>(input: (&'a mut R, usize)) -> Result<(usize, Self), DekuError>
+    fn from_reader<R>(input: (&'a mut R, usize)) -> Result<(usize, Self), DekuError>
     where
-        Self: Sized;
+        Self: Sized,
+        R: acid_io::Read + acid_io::Seek;
 }
 
 /// "Writer" trait: write from type to bits

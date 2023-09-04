@@ -3,8 +3,9 @@ use std::convert::TryInto;
 use deku::bitvec::{BitVec, Msb0};
 use deku::ctx::BitSize;
 use deku::prelude::*;
+use std::io::Cursor;
 
-fn bit_flipper_read<R: std::io::Read>(
+fn bit_flipper_read<R: std::io::Read + std::io::Seek>(
     field_a: u8,
     reader: &mut Reader<R>,
     bit_size: BitSize,
@@ -58,8 +59,9 @@ struct DekuTest {
 
 fn main() {
     let test_data = [0x01, 0b1001_0110];
+    let mut cursor = Cursor::new(test_data);
 
-    let (_rest, ret_read) = DekuTest::from_reader((&mut test_data.as_slice(), 0)).unwrap();
+    let (_rest, ret_read) = DekuTest::from_reader((&mut cursor, 0)).unwrap();
 
     assert_eq!(
         ret_read,

@@ -1,6 +1,6 @@
 //! Implementations of DekuRead and DekuWrite for tuples of length 1 to 11
 
-use acid_io::Read;
+use acid_io::{Read, Seek};
 use bitvec::prelude::*;
 
 use crate::{DekuError, DekuReader, DekuWrite};
@@ -38,7 +38,7 @@ macro_rules! ImplDekuTupleTraits {
 
         impl<'a, Ctx: Copy, $($T:DekuReader<'a, Ctx>+Sized),+> DekuReader<'a, Ctx> for ($($T,)+)
         {
-            fn from_reader_with_ctx<R: Read>(
+            fn from_reader_with_ctx<R: Read + Seek>(
                 reader: &mut crate::reader::Reader<R>,
                 ctx: Ctx,
             ) -> Result<Self, DekuError>
