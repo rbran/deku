@@ -40,7 +40,7 @@ impl<'a, W: Write> Writer<'a, W> {
     }
 
     /// Write all bits to `Writer` buffer if bits can fit into a byte buffer
-    #[inline]
+    #[cold]
     pub fn write_bits(&mut self, bits: &BitSlice<u8, Msb0>) -> Result<(), DekuError> {
         #[cfg(feature = "logging")]
         log::trace!("attempting {} bits", bits.len());
